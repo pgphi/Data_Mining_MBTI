@@ -1,0 +1,9 @@
+pandas
+os
+tqdm
+numpy
+nltk
+scikit-learn
+textbob
+sentence_transformers
+dill
