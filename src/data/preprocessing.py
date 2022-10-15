@@ -6,7 +6,6 @@ from nltk.stem import WordNetLemmatizer
 from nltk.stem.porter import PorterStemmer
 import pandas as pd
 from sklearn.decomposition import PCA
-import logging
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 import random
@@ -14,6 +13,8 @@ import random
 nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('wordnet')
+
+
 
 
 def tokenization(text: str):
