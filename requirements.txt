@@ -7,3 +7,4 @@ scikit-learn
 textbob
 sentence_transformers
 dill
+validators
