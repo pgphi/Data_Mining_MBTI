@@ -1,3 +1,5 @@
+import os
+
 import nltk
 import pandas as pd
 import re
@@ -69,7 +71,7 @@ def preprocessing(df, type):
 def group_prepro_data(df):
     """
     :param df: (preprocessed) data
-    :return: preprocessed csv file for each personality type and evaluations for each type i.e. ENFJ.
+    :return: preprocessed csv file for each personality type and evaluations for each type i.e. ENFJ and numeric labels:
     """
 
     df_grouped = df.groupby(by="type")
@@ -78,7 +80,7 @@ def group_prepro_data(df):
 
         if perso_type == "ENFJ":
             df_ENFJ = pd.DataFrame(data)
-            df_ENFJ.to_csv("data/df_ENFJ.csv")
+            df_ENFJ.to_csv("data/personality_types/df_ENFJ.csv")
             print(perso_type)
             print(df_ENFJ)
             print(data["posts"])
@@ -86,105 +88,331 @@ def group_prepro_data(df):
 
         elif perso_type == "ENFP":
             df_ENFP = pd.DataFrame(data)
-            df_ENFP.to_csv("data/df_ENFP.csv")
+            df_ENFP.to_csv("data/personality_types/df_ENFP.csv")
             print(perso_type)
             print(df_ENFP)
             preprocessing(df_ENFP, "ENFP")
 
         elif perso_type == "ENTJ":
             df_ENTJ = pd.DataFrame(data)
-            df_ENTJ.to_csv("data/df_ENTJ.csv")
+
+            df_ENTJ.to_csv("data/personality_types/df_ENTJ.csv")
             print(perso_type)
             print(df_ENTJ)
             preprocessing(df_ENTJ, "ENTJ")
 
         elif perso_type == "ENTP":
             df_ENTP = pd.DataFrame(data)
-            df_ENTP.to_csv("data/df_ENTP.csv")
+            df_ENTP.to_csv("data/personality_types/df_ENTP.csv")
             print(perso_type)
             print(df_ENTP)
             preprocessing(df_ENTP, "ENTP")
 
         elif perso_type == "ESFJ":
             df_ESFJ = pd.DataFrame(data)
-            df_ESFJ.to_csv("data/df_ESFJ.csv")
+            df_ESFJ.to_csv("data/personality_types/df_ESFJ.csv")
             print(perso_type)
             print(df_ESFJ)
             preprocessing(df_ESFJ, "ESFJ")
 
         elif perso_type == "ESFP":
             df_ESFP = pd.DataFrame(data)
-            df_ESFP.to_csv("data/df_ESFP.csv")
+            df_ESFP.to_csv("data/personality_types/df_ESFP.csv")
             print(perso_type)
             print(df_ESFP)
             preprocessing(df_ESFP, "ESFP")
 
         elif perso_type == "ESTP":
             df_ESTP = pd.DataFrame(data)
-            df_ESTP.to_csv("data/df_ESTP.csv")
+            df_ESTP.to_csv("data/personality_types/df_ESTP.csv")
             print(perso_type)
             print(df_ESTP)
             preprocessing(df_ESTP, "ESTP")
 
         elif perso_type == "INFJ":
             df_INFJ = pd.DataFrame(data)
-            df_INFJ.to_csv("data/df_INFJ.csv")
+            df_INFJ.to_csv("data/personality_types/df_INFJ.csv")
             print(perso_type)
             print(df_INFJ)
             preprocessing(df_INFJ, "INFJ")
 
         elif perso_type == "INFP":
             df_INFP = pd.DataFrame(data)
-            df_INFP.to_csv("data/df_INFP.csv")
+            df_INFP.to_csv("data/personality_types/df_INFP.csv")
             print(perso_type)
             print(df_INFP)
             preprocessing(df_INFP, "INFP")
 
         elif perso_type == "INTJ":
             df_INTJ = pd.DataFrame(data)
-            df_INTJ.to_csv("data/df_INTJ.csv")
+            df_INTJ.to_csv("data/personality_types/df_INTJ.csv")
             print(perso_type)
             print(df_INTJ)
             preprocessing(df_INTJ, "INTJ")
 
         elif perso_type == "INTP":
             df_INTP = pd.DataFrame(data)
-            df_INTP.to_csv("data/df_INTP.csv")
+            df_INTP.to_csv("data/personality_types/df_INTP.csv")
             print(perso_type)
             print(df_INTP)
             preprocessing(df_INTP, "INTP")
 
         elif perso_type == "ISFJ":
             df_ISFJ = pd.DataFrame(data)
-            df_ISFJ.to_csv("data/df_ISFJ.csv")
+            df_ISFJ.to_csv("data/personality_types/df_ISFJ.csv")
             print(perso_type)
             print(df_ISFJ)
             preprocessing(df_ISFJ, "ISFJ")
 
         elif perso_type == "ISFP":
             df_ISFP = pd.DataFrame(data)
-            df_ISFP.to_csv("data/df_ISFP.csv")
+            df_ISFP.to_csv("data/personality_types/df_ISFP.csv")
             print(perso_type)
             print(df_ISFP)
             preprocessing(df_ISFP, "ISFP")
 
         elif perso_type == "ISTJ":
             df_ISTJ = pd.DataFrame(data)
-            df_ISTJ.to_csv("data/df_ISTJ.csv")
+            df_ISTJ.to_csv("data/personality_types/df_ISTJ.csv")
             print(perso_type)
             print(df_ISTJ)
             preprocessing(df_ISTJ, "ISTJ")
 
         elif perso_type == "ISTP":
             df_ISTP = pd.DataFrame(data)
-            df_ISTP.to_csv("data/df_ISTP.csv")
+            df_ISTP.to_csv("data/personality_types/df_ISTP.csv")
             print(perso_type)
             print(df_ISTP)
             preprocessing(df_ISTP, "ISTP")
 
 
 # load data
-DF = pd.read_csv("data/mbti_1.csv")
+# DF = pd.read_csv("data/mbti_1.csv")
 
 # grouping and preprocessing
-group_prepro_data(DF)
+# group_prepro_data(DF)
+
+# create dataset with binary and multi labels
+def label_dataset(csv_files):
+
+    """
+    :return:
+    ENFJ - 0
+    ENFP - 1
+    ENTJ - 3
+    ENTP - 4
+    ESFJ - 5
+    ESFP - 6
+    ESTP - 7
+    INFJ - 8
+    INFP - 9
+    INTJ - 10
+    INTP - 11
+    ISFJ - 12
+    ISFP - 13
+    ISTJ - 14
+    ISTP - 15
+    ---------------
+    Extroverted - 1
+    Introverted - 0
+    """
+
+    list = csv_files
+
+    df_introverted_binary = pd.DataFrame()
+    df_extroverted_binary = pd.DataFrame()
+    df_extroverted_multi = pd.DataFrame()
+    df_introverted_multi = pd.DataFrame()
+
+    for csv in list:
+
+        if csv == "df_ENFJ.csv":
+            buffer = pd.read_csv("data/personality_types/"+csv)
+            df_extroverted_binary = df_extroverted_binary.append(buffer, ignore_index=True)
+            df_extroverted_binary.replace(to_replace="ENFJ", value=1, inplace=True)
+
+        elif csv == "df_ENFP.csv":
+            buffer = pd.read_csv("data/personality_types/"+csv)
+            df_extroverted_binary = df_extroverted_binary.append(buffer, ignore_index=True)
+            df_extroverted_binary.replace(to_replace="ENFP", value=1, inplace=True)
+
+        elif csv == "df_ENTJ.csv":
+            buffer = pd.read_csv("data/personality_types/"+csv)
+            df_extroverted_binary = df_extroverted_binary.append(buffer, ignore_index=True)
+            df_extroverted_binary.replace(to_replace="ENTJ", value=1, inplace=True)
+
+        elif csv == "df_ENTP.csv":
+            buffer = pd.read_csv("data/personality_types/"+csv)
+            df_extroverted_binary = df_extroverted_binary.append(buffer, ignore_index=True)
+            df_extroverted_binary.replace(to_replace="ENTP", value=1, inplace=True)
+
+        elif csv == "df_ESFJ.csv":
+            buffer = pd.read_csv("data/personality_types/"+csv)
+            df_extroverted_binary = df_extroverted_binary.append(buffer, ignore_index=True)
+            df_extroverted_binary.replace(to_replace="ESFJ", value=1, inplace=True)
+
+        elif csv == "df_ESFP.csv":
+            buffer = pd.read_csv("data/personality_types/"+csv)
+            df_extroverted_binary = df_extroverted_binary.append(buffer, ignore_index=True)
+            df_extroverted_binary.replace(to_replace="ESFP", value=1, inplace=True)
+
+        elif csv == "df_ESTP.csv":
+            buffer = pd.read_csv("data/personality_types/"+csv)
+            df_introverted_binary = df_introverted_binary.append(buffer, ignore_index=True)
+            df_extroverted_binary.replace(to_replace="ESTP", value=1, inplace=True)
+
+        elif csv == "df_INFJ.csv":
+            buffer = pd.read_csv("data/personality_types/"+csv)
+            df_introverted_binary = df_introverted_binary.append(buffer, ignore_index=True)
+            df_introverted_binary.replace(to_replace="INFJ", value=0, inplace=True)
+
+        elif csv == "df_INFP.csv":
+            buffer = pd.read_csv("data/personality_types/"+csv)
+            df_introverted_binary = df_introverted_binary.append(buffer, ignore_index=True)
+            df_introverted_binary.replace(to_replace="INFP", value=0, inplace=True)
+
+        elif csv == "df_INTJ.csv":
+            buffer = pd.read_csv("data/personality_types/"+csv)
+            df_introverted_binary = df_introverted_binary.append(buffer, ignore_index=True)
+            df_introverted_binary.replace(to_replace="INTJ", value=0, inplace=True)
+
+        elif csv == "df_INTP.csv":
+            buffer = pd.read_csv("data/personality_types/"+csv)
+            df_introverted_binary = df_introverted_binary.append(buffer, ignore_index=True)
+            df_introverted_binary.replace(to_replace="INTP", value=0, inplace=True)
+
+        elif csv == "df_ISFJ.csv":
+            buffer = pd.read_csv("data/personality_types/"+csv)
+            df_introverted_binary = df_introverted_binary.append(buffer, ignore_index=True)
+            df_introverted_binary.replace(to_replace="ISFJ", value=0, inplace=True)
+
+        elif csv == "df_ISFP.csv":
+            buffer = pd.read_csv("data/personality_types/"+csv)
+            df_introverted_binary = df_introverted_binary.append(buffer, ignore_index=True)
+            df_introverted_binary.replace(to_replace="ISFP", value=0, inplace=True)
+
+        elif csv == "df_ISTJ.csv":
+            buffer = pd.read_csv("data/personality_types/"+csv)
+            df_introverted_binary = df_introverted_binary.append(buffer, ignore_index=True)
+            df_introverted_binary.replace(to_replace="ISTJ", value=0, inplace=True)
+
+        elif csv == "df_ISTP.csv":
+            buffer = pd.read_csv("data/personality_types/"+csv)
+            df_introverted_binary = df_introverted_binary.append(buffer, ignore_index=True)
+            df_introverted_binary.replace(to_replace="ISTP", value=0, inplace=True)
+
+        elif csv == "df_ENFJ.csv":
+            buffer = pd.read_csv("data/personality_types/" + csv)
+            df_extroverted_multi = df_extroverted_multi.append(buffer, ignore_index=True)
+            df_extroverted_multi.replace(to_replace="ENFJ", value=0, inplace=True)
+
+        elif csv == "df_ENFP.csv":
+            buffer = pd.read_csv("data/personality_types/" + csv)
+            df_extroverted_multi = df_extroverted_multi.append(buffer, ignore_index=True)
+            df_extroverted_multi.replace(to_replace="ENFP", value=1, inplace=True)
+
+        elif csv == "df_ENTJ.csv":
+            buffer = pd.read_csv("data/personality_types/" + csv)
+            df_extroverted_multi = df_extroverted_multi.append(buffer, ignore_index=True)
+            df_extroverted_multi.replace(to_replace="ENTJ", value=2, inplace=True)
+
+        elif csv == "df_ENTP.csv":
+            buffer = pd.read_csv("data/personality_types/" + csv)
+            df_extroverted_multi = df_extroverted_multi.append(buffer, ignore_index=True)
+            df_extroverted_multi.replace(to_replace="ENTP", value=3, inplace=True)
+
+        elif csv == "df_ESFJ.csv":
+            buffer = pd.read_csv("data/personality_types/" + csv)
+            df_extroverted_multi = df_extroverted_multi.append(buffer, ignore_index=True)
+            df_extroverted_multi.replace(to_replace="ESFJ", value=4, inplace=True)
+
+        elif csv == "df_ESFP.csv":
+            buffer = pd.read_csv("data/personality_types/" + csv)
+            df_extroverted_multi = df_extroverted_multi.append(buffer, ignore_index=True)
+            df_extroverted_multi.replace(to_replace="ESFP", value=5, inplace=True)
+
+        elif csv == "df_ESTP.csv":
+            buffer = pd.read_csv("data/personality_types/" + csv)
+            df_introverted_multi = df_introverted_multi.append(buffer, ignore_index=True)
+            df_extroverted_multi.replace(to_replace="ESTP", value=6, inplace=True)
+
+        elif csv == "df_INFJ.csv":
+            buffer = pd.read_csv("data/personality_types/" + csv)
+            df_introverted_multi = df_introverted_multi.append(buffer, ignore_index=True)
+            df_introverted_multi.replace(to_replace="INFJ", value=7, inplace=True)
+
+        elif csv == "df_INFP.csv":
+            buffer = pd.read_csv("data/personality_types/" + csv)
+            df_introverted_multi = df_introverted_multi.append(buffer, ignore_index=True)
+            df_introverted_multi.replace(to_replace="INFP", value=8, inplace=True)
+
+        elif csv == "df_INTJ.csv":
+            buffer = pd.read_csv("data/personality_types/" + csv)
+            df_introverted_multi = df_introverted_multi.append(buffer, ignore_index=True)
+            df_introverted_multi.replace(to_replace="INTJ", value=9, inplace=True)
+
+        elif csv == "df_INTP.csv":
+            buffer = pd.read_csv("data/personality_types/" + csv)
+            df_introverted_multi = df_introverted_multi.append(buffer, ignore_index=True)
+            df_introverted_multi.replace(to_replace="INTP", value=10, inplace=True)
+
+        elif csv == "df_ISFJ.csv":
+            buffer = pd.read_csv("data/personality_types/" + csv)
+            df_introverted_multi = df_introverted_multi.append(buffer, ignore_index=True)
+            df_introverted_multi.replace(to_replace="ISFJ", value=11, inplace=True)
+
+        elif csv == "df_ISFP.csv":
+            buffer = pd.read_csv("data/personality_types/" + csv)
+            df_introverted_multi = df_introverted_multi.append(buffer, ignore_index=True)
+            df_introverted_multi.replace(to_replace="ISFP", value=12, inplace=True)
+
+        elif csv == "df_ISTJ.csv":
+            buffer = pd.read_csv("data/personality_types/" + csv)
+            df_introverted_multi = df_introverted_multi.append(buffer, ignore_index=True)
+            df_introverted_multi.replace(to_replace="ISTJ", value=13, inplace=True)
+
+        elif csv == "df_ISTP.csv":
+            buffer = pd.read_csv("data/personality_types/" + csv)
+            df_introverted_multi = df_introverted_multi.append(buffer, ignore_index=True)
+            df_introverted_multi.replace(to_replace="ISTP", value=14, inplace=True)
+
+
+        # create csv files
+        df_multi_all = df_introverted_multi.append(df_extroverted_multi)
+        df_multi_all.to_csv("data/df_multi_all.csv")
+        df_extroverted_multi.to_csv("data/df_extroverted_multi.csv")
+        df_introverted_multi.to_csv("data/df_introverted_multi.csv")
+
+        df_binary_all = df_introverted_binary.append(df_extroverted_binary)
+        df_binary_all.to_csv("data/df_binary_all.csv")
+        df_extroverted_binary.to_csv("data/df_extroverted_binary.csv")
+        df_introverted_binary.to_csv("data/df_introverted_binary.csv")
+
+
+    return [df_binary_all, df_introverted_binary, df_extroverted_binary,
+            df_multi_all, df_introverted_multi, df_extroverted_multi]
+
+
+# create csv datasets for classifier
+csv_files = os.listdir("data/personality_types")
+label_dataset(csv_files)
+
+
+"""
+df_bin_all = label_dataset(csv_files)[0]
+#print(df_bin_all)
+df_intro_bin = label_dataset(csv_files)[1]
+#print(df_intro_bin)
+df_extro_bin = label_dataset(csv_files)[2]
+#print(df_extro_bin)
+df_mult_all = label_dataset(csv_files)[3]
+#print(df_mult_all)
+df_extro_mult = label_dataset(csv_files)[4]
+#print(df_extro_mult)
+df_intro_mult = label_dataset(csv_files)[5]
+#print(df_intro_mult)
+"""
+
+
+
+
