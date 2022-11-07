@@ -11,4 +11,6 @@ validators
 Django~=4.1.2
 django-emoji~=2.2.2
 re
-tldextract~=3.2.0  
+tldextract~=3.2.0
+gensim~=4.2.0
+matplotlib~=3.6.2
