@@ -1,2 +1,3 @@
-data/mbti_preprocessed_complete.csv
+mbti_preprocessed_complete.csv
 mbit_preprocessed_features.csv
+.vscode/settings.json
