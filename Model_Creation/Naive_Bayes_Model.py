@@ -1,6 +1,8 @@
 # install/import packages
 import pandas as pd
 import numpy as np
+import os
+
 import gensim
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
@@ -14,7 +16,9 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import GridSearchCV
 
 # 1) Import (preprocessed) Dataset
-df = pd.read_csv("data/mbti_preprocessed_complete.csv")
+path = os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + os.sep + "data" + os.sep + "mbti_preprocessed_complete.csv"
+df = pd.read_csv(path, index_col=0)
+
 y_mult_16 = df.iloc[:, 3].values
 y_bin = df.iloc[:, 5].values
 X = df.iloc[:, 4].values
