@@ -11,7 +11,6 @@ import pandas as pd
 import random
 import re
 import tldextract
-import string
 nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('wordnet')
