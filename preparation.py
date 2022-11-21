@@ -1,13 +1,21 @@
+# For Data
 import os
 import pandas as pd
-from nltk.probability import FreqDist
-from matplotlib import pyplot as plt
-from wordcloud import WordCloud
+import numpy as np
+
+# For Preprocessing
 import re
 import tldextract
 from nltk.corpus import stopwords
 import nltk
 from nltk.stem import WordNetLemmatizer
+
+# For Data Exploration
+from nltk.probability import FreqDist
+from matplotlib import pyplot as plt
+import seaborn as sns
+from wordcloud import WordCloud
+
 
 
 def preprocessing(posts):
