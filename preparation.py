@@ -100,17 +100,18 @@ def exploration(df, n):
     """
     :param df: rows of preprocessed text column from dataset
     :param n: top N-frequent words
-    :return: top N-words frequency graph and wordcloud of preprocessed text
+    :return: top N-words frequency graph and wordcloud of preprocessed text and plot distribution of dataset
     """
 
-    for i in df:
+    preprocessed_text = df["preprocessed_text"][0:N]
+
+    for i in preprocessed_text:
         corpus = "".join(i)
 
     tokens = nltk.word_tokenize(corpus.lower())
     # print(tokens)
 
     frequency_distribution = FreqDist(tokens)
-    print(frequency_distribution)
     plt.ion()
     frequency_distribution.plot(n, title="Most " + str(n) + "-Words in corpus", cumulative=False)
     plt.savefig("img/" + "word_frequency.png")
@@ -122,6 +123,16 @@ def exploration(df, n):
     plt.imshow(word_cloud, interpolation='bilinear')
     plt.axis("off")
     plt.savefig("img/" + "corpus_wordcloud.png")
+    plt.ioff()
+    plt.show()
+
+    # Plot distribution of dataset - (un)balanced?
+    fig, ax = plt.subplots()
+    fig.suptitle("Dataset Distribution", fontsize=12)
+    df.reset_index().groupby("type").count().sort_values(by=
+                                                        "index").plot(kind="barh", legend=False,
+                                                                      ax=ax).grid(axis='x')
+    plt.savefig("img/" + "dataset_distribution.png")
     plt.ioff()
     plt.show()
 
@@ -327,7 +338,9 @@ def binary_labeling(list):
 
 
 
-# ----------------------------------------------- Call Functions ----------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
+
+# Initialize
 
 # Variable for adjusting how many rows we work with (for testing purposes only! For production use length of dataset)
 N = 1000 # len of dataset 8675
@@ -335,7 +348,7 @@ N = 1000 # len of dataset 8675
 # import raw dataset
 df = pd.read_csv("data/mbti_1.csv")
 print("Raw Dataset")
-print(df.head() + "\n")
+print(df.head())
 
 
 # create new csv file of dataset with added preprocessed text data
@@ -346,17 +359,16 @@ print(df.head() + "\n")
 
 
 # Data Exploration
-dataset = df["preprocessed_text"][0:N]
-exploration(dataset, 50)
+exploration(df, 50)
 
 
 # Create different MBTI personality groups and output them as csv files
-group_data(df)
+# group_data(df)
 
 
 # Label MBTI groups as extroverted (1) and introverted (0) in one big csv file
-list = os.listdir("data/personality_types")
-binary_labeling(list)
-df_binary = pd.read_csv("data/df_binary_preprocessed.csv")
-print("Preprocessed Binary Dataset")
-print(df_binary.head())
+#list = os.listdir("data/personality_types")
+#binary_labeling(list)
+#df_binary = pd.read_csv("data/df_binary_preprocessed.csv")
+#print("Preprocessed Binary Dataset")
+#print(df_binary.head())
