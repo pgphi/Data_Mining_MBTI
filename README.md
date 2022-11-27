@@ -1,6 +1,8 @@
-## About this Project
-Classifying 16 personality types based on text input.
+# About this Project
+The purpose of this project is, to classify 16 personality types based on a given text input.
 
-### To-Do-List
-    - Create datasets with whole text corpus and sentenced corpus, if input is just small text snippets.
-    
+    i.e. "This evening i will enjoy myself at home drinking a cup of tea" --> "INFP"
+
+# Logic of main.py
+
+...
