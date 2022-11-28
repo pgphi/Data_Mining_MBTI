@@ -2,17 +2,18 @@
 import pandas as pd
 
 # For Preparation
-from preparation import preprocessing, exploration, visualize_3D_context
+from imblearn.over_sampling import RandomOverSampler
+
+from preparation import preprocessing, exploration, visualize_3D_context, train_test_split, \
+    feature_generator, BERT_Features
 
 # For Classification
-from classification import train_test_split, feature_generator, \
-    BERT_feature_matrix, naiveBayes, BERT_classifier, neural_net_classifier
-
+from NB_SG_BERT import naiveBayes, BERT_classifier, NN_classifier
 
 if __name__ == "__main__":
 
     # Variable for adjusting how many rows we work with (for testing purposes only! For production use length of dataset)
-    N = 1000  # len of dataset 8675
+    N = 8675  # len of dataset 8675
 
 
     # import raw dataset
@@ -25,22 +26,22 @@ if __name__ == "__main__":
 
 
     # Create Train and Test Split
-    X_train, X_test, y_train, y_test, y_train_enc, y_test_enc = train_test_split(df, 0.3, 42)
+    X_train, X_test, y_train, y_test = train_test_split(df, 0.3, 42069, balancing=True, binary=True)
 
 
     # Data Exploration
-    #preprocessed_text = df["preprocessed_text"]
-    #exploration(df, preprocessed_text, 50)
-    #visualize_3D_context(preprocessed_text, "think", 300, 5, 5)
+    # preprocessed_text = X_train["preprocessed_text"]
+    # exploration(X_train, preprocessed_text, 50)
+    # visualize_3D_context(preprocessed_text, "think", 300, 5, 5)
 
 
     # Feature Generation and Vectorizing (TFIDF, BOW or Embeddings) of Training corpus for Classification
-    #X_train_vec, X_test_pad_seq, vectorizer = feature_generator(X_train, X_test, y_train, 2, "tfidf")
-    X_train_Feature_Matrix = BERT_feature_matrix(X_train)
-    X_test_Feature_Matrix = BERT_feature_matrix(X_test)
+    # X_train_vec, X_test_pad_seq, vectorizer = feature_generator(X_train, X_test, y_train, 2, "w2v_embeddings", 0.95)
+    X_train_Feature_Matrix = BERT_Features(X_train)
+    X_test_Feature_Matrix = BERT_Features(X_test)
 
 
     # Classification
-    #naiveBayes(X_train_vec, y_train, X_test, y_test, vectorizer)  # use bow or tfidf for vectorizer!
-    # neural_net_classifier(X_train_vec, y_train, X_test_pad_seq, y_test, vectorizer)  # use embeddings for vectorizer!
-    BERT_classifier(X_train_Feature_Matrix, X_test_Feature_Matrix, y_train, y_test) # use BERT feature matrix
+    # naiveBayes(X_train_vec, y_train, X_test, y_test, vectorizer)  # use bow or tfidf for vectorizer!
+    # NN_classifier(X_train_vec, y_train, X_test_pad_seq, y_test, vectorizer, binary=True)  # use different embeddings for vectorizer!
+    BERT_classifier(X_train_Feature_Matrix, X_test_Feature_Matrix, y_train, y_test, binary=True, epoch=3) # use BERT Features!
