@@ -320,6 +320,8 @@ def feature_generator(X_train, X_test, y_train, n_gram, vectorizer, p_value):
             features = features.sort_values(["y", "score"], ascending=[True, False])
             features = features[features["score"] > p_value_limit]
         X_names = features["feature"].unique().tolist()
+        print(X_names)
+        print(len(X_names))
 
         for cat in np.unique(y_train):
             print("# {}:".format(cat))
@@ -375,7 +377,7 @@ def feature_generator(X_train, X_test, y_train, n_gram, vectorizer, p_value):
 
         ##Reduce Dimensionality for sparse data with Chi-Quadrat
         X_names = BOW.get_feature_names_out()
-        p_value_limit = 0.95
+        p_value_limit = p_value
         features = pd.DataFrame()
         print("Top Features for Each Class:")
         for cat in np.unique(y_train):
@@ -385,6 +387,8 @@ def feature_generator(X_train, X_test, y_train, n_gram, vectorizer, p_value):
             features = features.sort_values(["y", "score"], ascending=[True, False])
             features = features[features["score"] > p_value_limit]
         X_names = features["feature"].unique().tolist()
+        print(X_names)
+        print(len(X_names))
 
         for cat in np.unique(y_train):
             print("# {}:".format(cat))
