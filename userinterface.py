@@ -1,5 +1,4 @@
 from datetime import time
-
 import streamlit as st
 import pandas as pd
 from gensim.models import Word2Vec
