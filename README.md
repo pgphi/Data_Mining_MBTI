@@ -19,6 +19,8 @@ The purpose of this project is, to classify the MBTI 16 personality types based 
    
     i.e. "This evening i will enjoy myself at home drinking a cup of tea" --> "INFP"
     
+!(https://github.com/pgphi/Data_Mining_MBTI/blob/main/img/ui.png)
+    
 #### Problem
 In order to classify the different personality types, we use a multi-classification approach. Furthermore,
 we use the following paradigms for solving the multi-classification problem:
