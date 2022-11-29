@@ -43,6 +43,8 @@ def word_context(word):
 
 
 def userinterface():
+    
+    """
     st.title("Classifying Personality Types 🎭")
     st.subheader("University of Mannheim - DM I - Prof. Paulheim")
     st.write("A Project from Stefan, Mariam, Priscilla, Ricarda, Fabian and Philipp")
@@ -66,7 +68,11 @@ def userinterface():
     st.markdown("")
     st.markdown("***")
     st.markdown("")
+    """
+    
     st.subheader("Analyzing The Word Context based on Personality Types 💬")
+    st.write("University of Mannheim - DM I - Prof. Paulheim")
+    st.caption("A Project from Stefan, Mariam, Priscilla, Ricarda, Fabian and Philipp")
 
 
     word = st.text_input("Type in your favorite word:", placeholder="i.e. thinking")
