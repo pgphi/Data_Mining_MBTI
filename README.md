@@ -1,4 +1,4 @@
----
+
 
 Authors: Ricarda Reiner (1557371), Stefan Stingl (1869334), Fabian Rajwa (1687954),
 Philipp Ganster (1554076), Priscilla Chyrva (1666533), Mariam Arustashvili (1939130)
@@ -9,7 +9,7 @@ Prof. Dr. Heiko Paulheim
 University of Mannheim
 December 2022
 
--
+---
 
 
 # About this Project
