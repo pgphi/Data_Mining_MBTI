@@ -26,22 +26,24 @@ if __name__ == "__main__":
 
 
     # Create Train and Test Split
-    X_train, X_test, y_train, y_test = train_test_split(df, 0.3, 42069, balancing=True, binary=True)
+    X_train, X_test, y_train, y_test = train_test_split(df, 0.3, 42069, balancing=False, binary=False)
 
 
     # Data Exploration
-    # preprocessed_text = X_train["preprocessed_text"]
-    # exploration(X_train, preprocessed_text, 50)
+    # preprocessed_text = df["preprocessed_text"]
+    # exploration(X_train, preprocessed_text, 100)
     # visualize_3D_context(preprocessed_text, "think", 300, 5, 5)
 
 
     # Feature Generation and Vectorizing (TFIDF, BOW or Embeddings) of Training corpus for Classification
-    # X_train_vec, X_test_pad_seq, vectorizer = feature_generator(X_train, X_test, y_train, 2, "w2v_embeddings", 0.95)
-    X_train_Feature_Matrix = BERT_Features(X_train)
-    X_test_Feature_Matrix = BERT_Features(X_test)
+    # X_train_vec, X_test_pad_seq, vectorizer = feature_generator(X_train, X_test, y_train, 2, "w2v_embeddings", 0.95,
+                                                                # 10000, maxsenlen=50)
+
+    X_train_Feature_Matrix = BERT_Features(X_train, False, max_len=30)
+    X_test_Feature_Matrix = BERT_Features(X_test, False, max_len=30)
 
 
     # Classification
-    # naiveBayes(X_train_vec, y_train, X_test, y_test, vectorizer)  # use bow or tfidf for vectorizer!
-    # NN_classifier(X_train_vec, y_train, X_test_pad_seq, y_test, vectorizer, binary=True)  # use different embeddings for vectorizer!
-    BERT_classifier(X_train_Feature_Matrix, X_test_Feature_Matrix, y_train, y_test, binary=True, epoch=3) # use BERT Features!
+    # naiveBayes(X_train_vec, y_train, X_test, y_test, vectorizer, binary=True)  # use bow or tfidf for vectorizer!
+    # NN_classifier(X_train_vec, y_train, X_test_pad_seq, y_test, vectorizer, binary=True, maxlen=50, epoch=1)  # use different embeddings for vectorizer!
+    BERT_classifier(X_train_Feature_Matrix, X_test_Feature_Matrix, y_train, y_test, binary=False, epoch=3, maxlen=30) # use BERT Features!
