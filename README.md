@@ -55,13 +55,11 @@ we use the following paradigms for solving the multi-classification problem:
     df["preprocessed_text"] = df["posts"].apply(lambda x: preprocessing(x))
     df.to_csv("data/df_multi_preprocessed.csv")
 
-###### Create train and test split and choose in function whether you want to balance (Oversampler with not majority strategy) 
-###### and whether you want to encode the target variable for binary- (1 - Introverted | 0 - Extroverted) or multi-classification
+###### Create train and test split and choose in function whether you want to balance (Oversampler with not majority strategy) and whether you want to encode the target variable for binary- (1 - Introverted | 0 - Extroverted) or multi-classification
     # Create Train and Test Split
     X_train, X_test, y_train, y_test = train_test_split(df, 0.3, 42069, balancing=True, binary=False)
 
-###### Exploration function outputs the most frequent 100 words.
-###### visualize_3D_context function outputs the 20 context words of a given word.
+###### Exploration function outputs the most frequent 100 words. visualize_3D_context function outputs the 20 context words of a given word.
     # Data Exploration
     preprocessed_text = df["preprocessed_text"]
     exploration(X_train, preprocessed_text, 100)
@@ -141,8 +139,7 @@ we use the following paradigms for solving the multi-classification problem:
         . selected features: 65
         . top features: an istp,istp,istps,the istp,istps are,istp and,mechanic,fuck,sport,bike
 
-###### Call Classifiers. Every function is given vectorizer (i.e. Embeddings; TFIDF only for naiveBayes). Also choose training parameters (epoch, maxlen)
-###### and whether to do k_fold and binary- or multi-classification.
+###### Call Classifiers. Every function is given vectorizer (i.e. Embeddings; TFIDF only for naiveBayes). Also choose training parameters (epoch, maxlen) and whether to do k_fold and binary- or multi-classification.
     # Classification
     naiveBayes(X_train_vec, y_train, X_test, y_test, vectorizer, binary=False, k_fold=True)  # use bow or tfidf for vectorizer!
     NN_classifier(X_train_vec, y_train, X_test_pad_seq, y_test, vectorizer, binary=True, maxlen=50, epoch=1)  # use different embeddings for vectorizer!
