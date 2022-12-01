@@ -1,6 +1,8 @@
 ## for data
 import pandas as pd
 import numpy as np
+from numpy import mean
+from numpy import std
 
 ## for plotting
 import matplotlib.pyplot as plt
@@ -11,20 +13,37 @@ from sklearn import naive_bayes, pipeline
 
 ## for deep learning
 from sklearn.metrics import accuracy_score, roc_auc_score, classification_report, confusion_matrix, f1_score
+from sklearn.model_selection import cross_val_score, KFold
 from tensorflow.keras import models, layers, preprocessing as kprocessing
 
 ## for bert language model
 import transformers
 
+# Save and Load
+import pickle
+
 
 ##Classification
-def naiveBayes(X_training, y_training, X_testing, y_testing, vectorizer):
+def naiveBayes(X_training, y_training, X_testing, y_testing, vectorizer, binary=bool, k_fold=bool):
+
+    """
+    :param X_training: Training Split
+    :param y_training: Training Split target
+    :param X_testing: Testing Split
+    :param y_testing: Testing Split target
+    :param vectorizer: tfidf or bow
+    :param binary: choose if binary classification (True) or multi (False)
+    :param k_fold: if true start k-fold cross validation
+    :return: output evaluation report
+    """
+
     classifier = naive_bayes.MultinomialNB()
 
     ## pipeline
 
     model = pipeline.Pipeline([("vectorizer", vectorizer),
                                ("classifier", classifier)])
+
 
     """
     print("Y Training Data:")
@@ -42,40 +61,84 @@ def naiveBayes(X_training, y_training, X_testing, y_testing, vectorizer):
 
     ## train classifier
     model["classifier"].fit(X_training, y_training)
+    pickle.dump(model, open('models/naive_bayes_model.pkl', 'wb'))
 
     ## test
     X = X_testing["preprocessed_text"].values.astype(str)
     predicted = model.predict(X)
     predicted_prob = model.predict_proba(X)
 
+    if k_fold:
+        # prepare the cross-validation procedure
+        cv = KFold(n_splits=10, random_state=1, shuffle=True)
+
+        # create model
+        scores = cross_val_score(model["classifier"], X_training, y_training, scoring='f1_micro', cv=cv, n_jobs=-1)
+
+        # report performance
+        print('Micro-F1: %.3f (%.3f)' % (mean(scores), std(scores)))
+        return None
+
+    else:
+        None
+
     ## Evaluation
     classes = np.unique(y_testing)
 
-    ## Accuracy, Precision, Recall
-    accuracy = accuracy_score(y_testing, predicted)
-    auc = roc_auc_score(y_testing, predicted_prob, multi_class="ovr")
-    micro_f1 = f1_score(y_testing, predicted, average="micro")
-    print("Accuracy:", round(accuracy, 2))
-    print("Auc:", round(auc, 2))
-    print("Micro F1:", round(micro_f1, 2))
-    print()
-    print("Detail:")
-    print(classification_report(y_testing, predicted))
+    if binary:
 
-    ## Plot confusion matrix
-    cm = confusion_matrix(y_testing, predicted)
-    fig, ax = plt.subplots()
-    sns.heatmap(cm, annot=True, fmt='d', ax=ax, cmap=plt.cm.Blues,
-                cbar=False)
-    ax.set(xlabel="Pred", ylabel="True", xticklabels=classes,
-           yticklabels=classes, title="Naive Bayes Confusion matrix")
-    plt.yticks(rotation=0)
-    plt.savefig("img/" "naive_bayes_confusion_matrix.png")
-    plt.ioff()
-    plt.show()
+        ## Accuracy, Precision, Recall
+        print(predicted)
+        print(y_testing)
+        print(predicted_prob)
+        accuracy = accuracy_score(y_testing, predicted)
+        auc = roc_auc_score(y_testing, predicted_prob[: ,1])
+        micro_f1 = f1_score(y_testing, predicted, average="micro")
+        print("Accuracy:", round(accuracy, 2))
+        print("Auc:", round(auc, 2))
+        print("Micro F1:", round(micro_f1, 2))
+        print()
+        print("Detail:")
+        print(classification_report(y_testing, predicted))
+
+        ## Plot confusion matrix
+        cm = confusion_matrix(y_testing, predicted)
+        fig, ax = plt.subplots()
+        sns.heatmap(cm, annot=True, fmt='d', ax=ax, cmap=plt.cm.Blues,
+                    cbar=False)
+        ax.set(xlabel="Pred", ylabel="True", xticklabels=classes,
+               yticklabels=classes, title="Naive Bayes Confusion matrix")
+        plt.yticks(rotation=0)
+        plt.savefig("img/" "naive_bayes_confusion_matrix.png")
+        plt.ioff()
+        plt.show()
+
+    elif not binary:
+        ## Accuracy, Precision, Recall
+        accuracy = accuracy_score(y_testing, predicted)
+        auc = roc_auc_score(y_testing, predicted_prob, multi_class="ovr")
+        micro_f1 = f1_score(y_testing, predicted, average="micro")
+        print("Accuracy:", round(accuracy, 2))
+        print("Auc:", round(auc, 2))
+        print("Micro F1:", round(micro_f1, 2))
+        print()
+        print("Detail:")
+        print(classification_report(y_testing, predicted))
+
+        ## Plot confusion matrix
+        cm = confusion_matrix(y_testing, predicted)
+        fig, ax = plt.subplots()
+        sns.heatmap(cm, annot=True, fmt='d', ax=ax, cmap=plt.cm.Blues,
+                    cbar=False)
+        ax.set(xlabel="Pred", ylabel="True", xticklabels=classes,
+               yticklabels=classes, title="Naive Bayes Confusion matrix")
+        plt.yticks(rotation=0)
+        plt.savefig("img/" "naive_bayes_confusion_matrix.png")
+        plt.ioff()
+        plt.show()
 
 
-def NN_classifier(X_train_vec, y_train, X_test_pad_seq, y_test, vectorizer, binary=bool):
+def NN_classifier(X_train_vec, y_train, X_test_pad_seq, y_test, vectorizer, binary=bool, maxlen=int, epoch=int):
 
     """
     :param X_train_vec: Vectorized Training Data
@@ -84,6 +147,8 @@ def NN_classifier(X_train_vec, y_train, X_test_pad_seq, y_test, vectorizer, bina
     :param y_test: target test data
     :param vectorizer: embeddings
     :param binary: adjust model and scoring in regard to binary or multi
+    :param maxlen: max length of longest sentence (input layer)
+    :param epoch: number of training cycles
     :return: evaluation and classification report of neural network
     """
 
@@ -95,13 +160,13 @@ def NN_classifier(X_train_vec, y_train, X_test_pad_seq, y_test, vectorizer, bina
     """
 
     ## input
-    x_in = layers.Input(shape=(30,))
+    x_in = layers.Input(shape=(maxlen,))
 
     ## embedding
     x = layers.Embedding(input_dim=vectorizer.shape[0],
                          output_dim=vectorizer.shape[1],
                          weights=[vectorizer],
-                         input_length=30, trainable=False)(x_in)
+                         input_length=maxlen, trainable=False)(x_in)
 
     ## 2 layers of bidirectional lstm
     x = layers.Bidirectional(layers.LSTM(units=30, dropout=0.2,
@@ -119,7 +184,6 @@ def NN_classifier(X_train_vec, y_train, X_test_pad_seq, y_test, vectorizer, bina
 
     ## compile
     model = models.Model(x_in, y_out)
-    model.save("models/NN_classifier_v3")
 
     # model = models.Model.load("models/NN_classifier_v3")
     model.compile(loss='sparse_categorical_crossentropy',
@@ -148,8 +212,10 @@ def NN_classifier(X_train_vec, y_train, X_test_pad_seq, y_test, vectorizer, bina
 
     ## train deep neural network
     train_neuro_net = model.fit(x=X_train_vec, y=y_train, batch_size=256,
-                                epochs=10, shuffle=True, verbose=0,
+                                epochs=epoch, shuffle=True, verbose=0,
                                 validation_split=0.3)
+
+    #pickle.dump(model, open('models/NN_LSTM_model.pkl', 'wb'))
 
     ## plot loss and accuracy
     metrics = [k for k in train_neuro_net.history.keys() if ("loss" not in k) and ("val" not in k)]
@@ -177,7 +243,9 @@ def NN_classifier(X_train_vec, y_train, X_test_pad_seq, y_test, vectorizer, bina
     plt.show()
 
     ## test
+    print(X_test_pad_seq)
     predicted_prob = model.predict(X_test_pad_seq)
+    print(predicted_prob)
     predicted = [dic_y_mapping[np.argmax(pred)] for pred in predicted_prob]
 
     ## Evaluation
@@ -193,7 +261,6 @@ def NN_classifier(X_train_vec, y_train, X_test_pad_seq, y_test, vectorizer, bina
         #print(predicted_prob)
 
         auc = roc_auc_score(y_test, predicted_prob[: ,1], average="micro")
-
         micro_f1 = f1_score(y_test, predicted, average="micro")
         print("Accuracy:", round(accuracy, 2))
         print("Auc:", round(auc, 2))
@@ -241,7 +308,7 @@ def NN_classifier(X_train_vec, y_train, X_test_pad_seq, y_test, vectorizer, bina
         plt.ioff()
         plt.show()
 
-def BERT_classifier(X_train, X_test, y_train, y_test, binary, epoch):
+def BERT_classifier(X_train, X_test, y_train, y_test, binary, epoch, maxlen):
 
     """
     :param X_train: Training Data
@@ -250,17 +317,18 @@ def BERT_classifier(X_train, X_test, y_train, y_test, binary, epoch):
     :param y_test: Training Data Target
     :param binary: chose whether output is binary (True) or multi-classification (False)
     :param epoch: choose training parameter
+    :param maxlen: set maxlen i.e. 300 when longest sentence is 300 (!!! maxlen is 512!!!) --> input layer in model
     :return: BERT evaluation report
     """
 
     ## inputs
-    idx = layers.Input((50), dtype="int32", name="input_idx")
-    masks = layers.Input((50), dtype="int32", name="input_masks")
-    segments = layers.Input((50), dtype="int32", name="input_segments")
+    idx = layers.Input((maxlen), dtype="int32", name="input_idx")
+    masks = layers.Input((maxlen), dtype="int32", name="input_masks")
+    segments = layers.Input((maxlen), dtype="int32", name="input_segments")
 
     ## pre-trained bert
     nlp = transformers.TFBertModel.from_pretrained("bert-base-uncased")
-    bert_out, _ = nlp(idx, attention_mask=masks, token_type_ids=segments, return_dict=False)
+    bert_out, _ = nlp.bert(idx, attention_mask=masks, token_type_ids=segments, return_dict=False)
 
     ## fine-tuning
     x = layers.GlobalAveragePooling1D()(bert_out)
@@ -269,7 +337,6 @@ def BERT_classifier(X_train, X_test, y_train, y_test, binary, epoch):
 
     ## compile
     model = models.Model((idx, masks, segments), y_out)
-    model.save("models/text_multi_classifier_v1")  # load after trained for efficiency
 
     # load model
     #model = models.load_model("/models/text__multi_classifier_v1")
@@ -289,9 +356,11 @@ def BERT_classifier(X_train, X_test, y_train, y_test, binary, epoch):
 
     y_train = np.array([inverse_dic[y] for y in y_train])
 
-    training = model.fit(x=(X_train), y=y_train, batch_size=32,
+    model.fit(x=(X_train), y=y_train, batch_size=32,
                          epochs=epoch, shuffle=True, verbose=1,
                          validation_split=0.3)
+
+    #pickle.dump(model, open('models/BERT_model.pkl', 'wb'))
 
     ## test
     predicted_prob = model.predict(X_test)
@@ -328,7 +397,7 @@ def BERT_classifier(X_train, X_test, y_train, y_test, binary, epoch):
 
     elif not binary:
         accuracy = accuracy_score(y_test, predicted)
-        auc = roc_auc_score(y_test, predicted_prob[:], average="macro", multi_class="ovr")
+        auc = roc_auc_score(y_test, predicted_prob, average="macro", multi_class="ovr")
         micro_f1 = f1_score(y_test, predicted, average="micro")
         print("Accuracy:", round(accuracy, 2))
         print("Auc:", round(auc, 2))

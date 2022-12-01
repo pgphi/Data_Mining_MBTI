@@ -1,8 +1,8 @@
 # For Preprocessing
 import tldextract
 from imblearn.over_sampling import RandomOverSampler
-from nltk.corpus import stopwords
 import nltk
+from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 
 # For Data Exploration
@@ -13,6 +13,7 @@ from wordcloud import WordCloud
 ## for data
 import pandas as pd
 import numpy as np
+import pickle
 
 ## for plotting
 import matplotlib.pyplot as plt
@@ -33,10 +34,11 @@ from tensorflow.keras import models, layers, preprocessing as kprocessing
 import transformers
 
 
-def preprocessing(posts):
+def preprocessing(posts, remove_types=bool):
     """
     :param posts: one row of raw text column of dataset. This function will be applied to pandas DataFrame and
     iterated through everyrow with lambda function.
+    :param remove_types: When True remove mbti string types otherwise feature selection might be biased
     :return: cleaned text <string> column of dataset for every raw text row.
     """
 
@@ -82,6 +84,13 @@ def preprocessing(posts):
 
     custom_stopwords = stopwords_ - set(paper_words)
 
+    if remove_types:
+
+        # Remove mbti types, otherwise biased features
+        mbti_types = ["isjf", "enfp", "entj", "entp", "esfj", "esfp", "estj", "estp", "infj", "infp", "intj",
+                      "intp", "isfj", "isfp", "istj", "istp"]
+        custom_stopwords.update(mbti_types)
+
     clean_tokens = []
     for token in tokens:
         if token not in custom_stopwords:
@@ -116,6 +125,8 @@ def exploration(df, corpus, n):
 
     tokens = nltk.word_tokenize(corpus.lower())
     # print(tokens)
+    print("Anzahl aller tokens" + str(len(tokens)))
+    print(tokens)
 
     frequency_distribution = FreqDist(tokens)
     plt.ion()
@@ -125,7 +136,8 @@ def exploration(df, corpus, n):
     plt.show()
     plt.ion()
 
-    word_cloud = WordCloud(collocations=False, background_color='white').generate(corpus)
+    word_cloud = WordCloud(collocations=False, background_color='white', width=800, height=600).generate(corpus)
+    plt.figure(figsize=(20, 10))
     plt.imshow(word_cloud, interpolation='bilinear')
     plt.axis("off")
     plt.savefig("img/" + "corpus_wordcloud.png")
@@ -143,13 +155,14 @@ def exploration(df, corpus, n):
     plt.show()
 
 
-def visualize_3D_context(corpus, word, vector, window, epochs):
+def visualize_3D_context(corpus, word, vector, window, epochs, context):
     """
     :param epochs: no. of training iterations
     :param window: no. of words to be considered for context
     :param vector: vector size of word
     :param corpus: rows of preprocessed text data from dataset
     :param word: word from corpus
+    :param context: Choose how many context words you want to predict
     :return: 3D vector space visualization of word and it's context words
     """
 
@@ -165,14 +178,14 @@ def visualize_3D_context(corpus, word, vector, window, epochs):
 
     ## fit w2v
     w2v_model = Word2Vec(lst_corpus, vector_size=vector, window=window, min_count=1, sg=1, epochs=epochs)
-    w2v_model.save("models/w2v_word_context_v2")
+    pickle.dump(w2v_model, open('model.pkl', 'wb'))
     # w2v_model = Word2Vec.load("models/w2v_word_context_v2")
 
     ## Visualize word and its context in 3D Vector Space
     fig = plt.figure()
 
     ## word embedding
-    tot_words = [word] + [tupla[0] for tupla in w2v_model.wv.most_similar(word, topn=20)]
+    tot_words = [word] + [tupla[0] for tupla in w2v_model.wv.most_similar(word, topn=context)]
     print(tot_words)
     X = w2v_model.wv[tot_words]
 
@@ -213,12 +226,9 @@ def train_test_split(df, test_size, rs, balancing, binary):
     :return: Train and Test Split with and without encoding of <string> labels
     """
 
-    enc = OrdinalEncoder()
-    df["encoded_types"] = enc.fit_transform(df[["type"]])
-    # print("Raw Dataset:")
-    # print(df)
-
     if binary:
+    # 0 = Extroverted
+    # 1 = Introverted
 
         df = df.replace({"type": {"INTJ": "Introverted",
                                 "INTP": "Introverted",
@@ -237,7 +247,10 @@ def train_test_split(df, test_size, rs, balancing, binary):
                                 "ESTP": "Extroverted",
                                 "ESFP": "Extroverted"}})
 
-
+    enc = OrdinalEncoder()
+    df["encoded_types"] = enc.fit_transform(df[["type"]])
+    # print("Raw Dataset:")
+    # print(df)
 
     # Create training and test split
     ## get X
@@ -248,16 +261,16 @@ def train_test_split(df, test_size, rs, balancing, binary):
     # print(X_test)
 
     ## get target
-    y_train = X_train["type"].values
+    y_train = X_train["encoded_types"].values
     print("Y Train Set:" + "länge=" + str(len(y_train)))
     # print(y_train)
-    y_test = X_test["type"].values
+    y_test = X_test["encoded_types"].values
     print("Y Test Set:" + "länge=" + str(len(y_test)))
     # print(y_test)
 
-    # Balancing
+    # Balancing (only training data!)
     if balancing:
-        oversample = RandomOverSampler(sampling_strategy="minority")
+        oversample = RandomOverSampler(sampling_strategy="not majority")
         X_over, y_over = oversample.fit_resample(X_train, y_train)
         X_train = X_over
         y_train = y_over
@@ -268,7 +281,7 @@ def train_test_split(df, test_size, rs, balancing, binary):
     return X_train, X_test, y_train, y_test
 
 
-def feature_generator(X_train, X_test, y_train, n_gram, vectorizer, p_value):
+def feature_generator(X_train, X_test, y_train, n_gram, vectorizer, p_value, max_feat, maxsenlen):
 
     """
     :param X_train: training data
@@ -277,6 +290,8 @@ def feature_generator(X_train, X_test, y_train, n_gram, vectorizer, p_value):
     :param n_gram: set <integer> for bigram, trigram etc.
     :param vectorizer: choose vectorizer <string> ("tfidf", "bow", "w2v_embedding" or "fasttext")
     :param p-value: Set threshold for vocabulary size (the higher the lower the size, but more correlated words v.v.)
+    :param max_feat: vocabulary size
+    :param maxsenlen: maximum length of longest sentences
     :return: sparse matrix, re-fitted sparse matrix (chi2), tf/tfidf features and vectorized training data
     """
 
@@ -285,18 +300,19 @@ def feature_generator(X_train, X_test, y_train, n_gram, vectorizer, p_value):
     if vectorizer == "tfidf":
 
         ## TF-IDF (advanced variant of BoW)
-        TFIDF = feature_extraction.text.TfidfVectorizer(max_features=10000, ngram_range=(1, n_gram))
+        TFIDF = feature_extraction.text.TfidfVectorizer(max_features=max_feat, ngram_range=(1, n_gram))
 
         ##Extract Vocabulary
         corpus = X_train["preprocessed_text"].values.astype(str)
         TFIDF.fit(corpus)
         X_training = TFIDF.transform(corpus)
         dic_vocabulary = TFIDF.vocabulary_
-        # print("Training vocabulary size before dimension reduction: " + str(len(dic_vocabulary)))
+        print("Training vocabulary size before dimension reduction: " + str(len(dic_vocabulary)))
+        print(dic_vocabulary)
 
         ##Create Sparse Matrix: N (No. of Docs. or rows in training set) x 10000 (vocabulary size)
         sns.set()
-        sns.heatmap(X_training.todense()[:, np.random.randint(0, X_training.shape[1], 100)] == 0,
+        sns.heatmap(X_training.todense()[:, np.random.randint(0, X_training.shape[1], max_feat)] == 0,
                     vmin=0, vmax=1, cbar=False).set_title('TFIDF Sparse Matrix Sample (non-zero values in black)')
         plt.savefig("img/" + "TFIDF_sparse_matrix.png")
         plt.ioff()
@@ -312,7 +328,7 @@ def feature_generator(X_train, X_test, y_train, n_gram, vectorizer, p_value):
         X_names = TFIDF.get_feature_names_out()
         p_value_limit = p_value
         features = pd.DataFrame()
-        # print("Top Features for Each Class:")
+        print("Top Features for Each Class:")
         for cat in np.unique(y_train):
             chi2, p = feature_selection.chi2(X_training, y_train == cat)
             features = features.append(pd.DataFrame(
@@ -320,8 +336,8 @@ def feature_generator(X_train, X_test, y_train, n_gram, vectorizer, p_value):
             features = features.sort_values(["y", "score"], ascending=[True, False])
             features = features[features["score"] > p_value_limit]
         X_names = features["feature"].unique().tolist()
-        print(X_names)
-        print(len(X_names))
+        #print(X_names)
+        #print(len(X_names))
 
         for cat in np.unique(y_train):
             print("# {}:".format(cat))
@@ -337,10 +353,11 @@ def feature_generator(X_train, X_test, y_train, n_gram, vectorizer, p_value):
         X_train_vec = TFIDF.transform(corpus)
         dic_vocabulary = TFIDF.vocabulary_
         print("Training vocabulary size after dimension reduction: " + str(len(dic_vocabulary)))
+        print(dic_vocabulary)
 
         # New Sparse Matrix
         sns.set()
-        sns.heatmap(X_training.todense()[:, np.random.randint(0, X_training.shape[1], 100)] == 0,
+        sns.heatmap(X_training.todense()[:, np.random.randint(0, X_training.shape[1], len(dic_vocabulary))] == 0,
                     vmin=0, vmax=1, cbar=False).set_title(
             'Re-Fit TFIDF Sparse Matrix Sample (non-zero values in black)')
         plt.savefig("img/" + "re_fit_TFIDF_sparse_matrix.png")
@@ -352,7 +369,7 @@ def feature_generator(X_train, X_test, y_train, n_gram, vectorizer, p_value):
     elif vectorizer == "bow":
 
         ## Count (classic BoW)
-        BOW = feature_extraction.text.CountVectorizer(max_features=10000, ngram_range=(1, n_gram))
+        BOW = feature_extraction.text.CountVectorizer(max_features=max_feat, ngram_range=(1, n_gram))
 
         ##Extract Vocabulary
         corpus = X_train["preprocessed_text"].values.astype(str)
@@ -430,7 +447,14 @@ def feature_generator(X_train, X_test, y_train, n_gram, vectorizer, p_value):
                          for i in range(0, len(lst_words), 1)]
             lst_corpus.append(lst_grams)
         print("List of unigrams:")
-        print(lst_corpus[0:1])
+
+
+        """
+        for i in lst_corpus:
+            länge = len(i)
+            if länge > 1750:
+                print(länge)
+        """
 
         ## detect bigrams and trigrams
         """
@@ -459,7 +483,7 @@ def feature_generator(X_train, X_test, y_train, n_gram, vectorizer, p_value):
 
         ## padding sequence
         X_trained_pad_seq = kprocessing.sequence.pad_sequences(lst_text2seq,
-                                                               maxlen=30, padding="post", truncating="post")
+                                                               maxlen=maxsenlen, padding="post", truncating="post")
 
         # Visualize Sparse Matrix
         sns.set()
@@ -508,7 +532,7 @@ def feature_generator(X_train, X_test, y_train, n_gram, vectorizer, p_value):
         print(lst_text2seq[0:1])
 
         ## padding sequence
-        X_test_pad_seq = kprocessing.sequence.pad_sequences(lst_text2seq, maxlen=30, padding="post", truncating="post")
+        X_test_pad_seq = kprocessing.sequence.pad_sequences(lst_text2seq, maxlen=maxsenlen, padding="post", truncating="post")
 
         # Create matrix of embedding for weight matrix in neural network classifier
         ## start the matrix (length of vocabulary x vector size) with all 0s
@@ -572,7 +596,7 @@ def feature_generator(X_train, X_test, y_train, n_gram, vectorizer, p_value):
 
         ## padding sequence
         X_trained_pad_seq = kprocessing.sequence.pad_sequences(lst_text2seq,
-                                                               maxlen=30, padding="post", truncating="post")
+                                                               maxlen=maxsenlen, padding="post", truncating="post")
 
         # Visualize Sparse Matrix
         sns.set()
@@ -621,7 +645,7 @@ def feature_generator(X_train, X_test, y_train, n_gram, vectorizer, p_value):
         print(lst_text2seq[0:1])
 
         ## padding sequence
-        X_test_pad_seq = kprocessing.sequence.pad_sequences(lst_text2seq, maxlen=30, padding="post", truncating="post")
+        X_test_pad_seq = kprocessing.sequence.pad_sequences(lst_text2seq, maxlen=maxsenlen, padding="post", truncating="post")
 
         # Create matrix of embedding for weight matrix in neural network classifier
         ## start the matrix (length of vocabulary x vector size) with all 0s
@@ -642,12 +666,24 @@ def feature_generator(X_train, X_test, y_train, n_gram, vectorizer, p_value):
         return X_trained_pad_seq, X_test_pad_seq, embeddings
 
 
-def BERT_Features(X):
+def BERT_Features(X, production=bool, max_len=int):
+
+    """
+    :param X: Training Data
+    :param production: if production (TRUE) only text input <string> is given and not a <pandas> dataset with rows
+    :param max_len: max length of one input sentence (maximum is 512!!!)
+    :return: Features for BERT Model
+    """
+
     ## bert tokenizer
     tokenizer = transformers.BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
 
-    corpus = X["preprocessed_text"]
-    maxlen = 50
+    if not production:
+        corpus = X["preprocessed_text"]
+    else:
+        corpus = X
+
+    maxlen = max_len
 
     ## add special tokens
     maxqnans = int((maxlen - 20) / 2)
@@ -684,9 +720,9 @@ def BERT_Features(X):
                 i += 1
         segments.append(temp)
 
-    # print(len(segments[0]))
-    # print(len(masks[0]))
-    # print(len(idx[0]))
+    print(len(segments[0]))
+    print(len(masks[0]))
+    print(len(idx[0]))
 
     ## Feature Matrix: 3 x 700 (No. of Docs/rows) x 50
 
