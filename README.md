@@ -25,17 +25,21 @@ The purpose of this project is, to classify the MBTI 16 personality types based 
 In order to classify the different personality types, we use a multi-classification approach. Furthermore,
 we use the following paradigms for solving the multi-classification problem:
 
-##### Algebraic Models
-1) Naive Bayes Model
-2) ...
+##### Models for Classification
 
-##### Probabilistic Models
-1) Skip-Gram Model
-2) Transformers (BERT)
+1) Naive Bayes Model (Baseline)
+2) Decision Trees	Random Forest	
+3) Logistic Regression	
+4) LVM
+5) kNN
+6) Nearest Centroids	
+7) XGBoost
+8) Skip-Gram Model
+9) Transformers (BERT)
 
 
 
 
 # Logic of main.py
 
-...
+
