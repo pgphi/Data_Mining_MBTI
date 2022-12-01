@@ -14,12 +14,12 @@
 
 ### About this Project
 
+![User Interface](https://github.com/pgphi/Data_Mining_MBTI/blob/main/img/ui.png)
+
 #### Motivation
 The purpose of this project is, to classify the MBTI 16 personality types based on a given text input.
    
-    i.e. "This evening i will enjoy myself at home drinking a cup of tea" --> "INFP"
-    
-![User Interface](https://github.com/pgphi/Data_Mining_MBTI/blob/main/img/ui.png)
+    i.e. "This evening i will enjoy myself at home drinking a cup of tea" --> "INFP" (Rather introverted, than extroverted)
     
 #### Problem
 In order to classify the different personality types, we use a multi-classification approach. Furthermore,
