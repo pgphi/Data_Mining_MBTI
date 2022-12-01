@@ -25,7 +25,7 @@ The purpose of this project is, to classify the MBTI 16 personality types based 
 In order to classify the different personality types, we use a multi-classification approach. Furthermore,
 we use the following paradigms for solving the multi-classification problem:
 
-##### Models for Classification
+#### Models for Classification
 
 1) Naive Bayes Model (**Baseline**)
 2) Decision Trees	Random Forest	
@@ -36,6 +36,12 @@ we use the following paradigms for solving the multi-classification problem:
 7) XGBoost
 8) Skip-Gram Model
 9) Transformers (BERT)
+
+#### Methods for vectorizing Features
+1) TFIDF (**Baseline**)
+2) FastText Embeddings
+3) Word2Vec Embeddings
+4) BERT Embeddings (**Fine-tuned**)
 
 ---
 
