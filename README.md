@@ -37,7 +37,7 @@ we use the following paradigms for solving the multi-classification problem:
 8) Skip-Gram Model
 9) Transformers (BERT)
 
--
+---
 
 ### Logic of main.py In regard to baseline Model and Neural Networks
 
