@@ -27,7 +27,7 @@ we use the following paradigms for solving the multi-classification problem:
 
 ##### Models for Classification
 
-1) Naive Bayes Model (Baseline)
+1) Naive Bayes Model (**Baseline**)
 2) Decision Trees	Random Forest	
 3) Logistic Regression	
 4) LVM
@@ -45,44 +45,45 @@ we use the following paradigms for solving the multi-classification problem:
     # Variable for adjusting how many rows we work with (for testing purposes only! For production use length of dataset)
     N = 8675  # len of dataset 8675 Users with each various posts
 
+Choose no of rows you want to train model and make classifications
 
     # import raw dataset
     df = pd.read_csv("data/mbti_1.csv")[0:N]
 
+Import raw dataset
 
     # create new csv file of dataset with added preprocessed text data
     df["preprocessed_text"] = df["posts"].apply(lambda x: preprocessing(x))
     df.to_csv("data/df_multi_preprocessed.csv")
 
+Preprocess posts from users
 
     # Create Train and Test Split
     X_train, X_test, y_train, y_test = train_test_split(df, 0.3, 42069, balancing=True, binary=False)
 
-    pd.set_option('display.max_columns', None)
-
-    """
-    print(X_train[0:5])
-    print(X_test[0:5])
-    print(y_train[0:5])
-    print(y_test[0:5])
-    """
+Create train and test split and choose in function whether you want to balance (Oversampler with not majority strategy) 
+and whether you want to encode the target variable for binary- (1 - Introverted | 0 - Extroverted) or multi-classification
 
     # Data Exploration
-    # preprocessed_text = df["preprocessed_text"]
-    # exploration(X_train, preprocessed_text, 100)
-    # visualize_3D_context(preprocessed_text, "think", 300, 5, 5)
+    preprocessed_text = df["preprocessed_text"]
+    exploration(X_train, preprocessed_text, 100)
+    visualize_3D_context(preprocessed_text, "think", 300, 5, 5, 20)
 
+Exploration function outputs the most frequent 100 words.
+visualize_3D_context function outputs the 20 context words of a given word.
 
     # Feature Generation and Vectorizing (TFIDF, BOW or Embeddings) of Training corpus for Classification
     X_train_vec, X_test_pad_seq, vectorizer = feature_generator(X_train, X_test, y_train, 2, "tfidf", 0.95,
                                                                 10000, maxsenlen=100)
+    X_train_Feature_Matrix = BERT_Features(X_train, False, max_len=30)
+    X_test_Feature_Matrix = BERT_Features(X_test, False, max_len=30)
 
-    # X_train_Feature_Matrix = BERT_Features(X_train, False, max_len=30)
-    # X_test_Feature_Matrix = BERT_Features(X_test, False, max_len=30)
-
+Create and select Features with feature_generator for Naive Bayes and Neural Network and BERT_Features function for BERT Deep Neural Network.
 
     # Classification
     naiveBayes(X_train_vec, y_train, X_test, y_test, vectorizer, binary=False, k_fold=True)  # use bow or tfidf for vectorizer!
-    # NN_classifier(X_train_vec, y_train, X_test_pad_seq, y_test, vectorizer, binary=True, maxlen=50, epoch=1)  # use different embeddings for vectorizer!
-    # BERT_classifier(X_train_Feature_Matrix, X_test_Feature_Matrix, y_train, y_test, binary=False, epoch=3, maxlen=30) # use BERT Features!
+    NN_classifier(X_train_vec, y_train, X_test_pad_seq, y_test, vectorizer, binary=True, maxlen=50, epoch=1)  # use different embeddings for vectorizer!
+    BERT_classifier(X_train_Feature_Matrix, X_test_Feature_Matrix, y_train, y_test, binary=False, epoch=3, maxlen=30) # use BERT Features!
 
+Call Classifiers. Every function is given vectorizer (i.e. Embeddings; TFIDF only for naiveBayes). Also choose training parameters (epoch, maxlen)
+and whether to do k_fold and binary- or multi-classification.
