@@ -40,12 +40,12 @@ we use the following paradigms for solving the multi-classification problem:
 
 
 
-### Logic of main.py
+### Logic of main.py In regard to baseline Model and Neural Networks
 
     # Variable for adjusting how many rows we work with (for testing purposes only! For production use length of dataset)
     N = 8675  # len of dataset 8675 Users with each various posts
 
-Choose no of rows you want to train model and make classifications
+- Choose no of rows you want to train model and make classifications
 
     # import raw dataset
     df = pd.read_csv("data/mbti_1.csv")[0:N]
