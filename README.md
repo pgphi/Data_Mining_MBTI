@@ -49,9 +49,9 @@ we use the following paradigms for solving the multi-classification problem:
     # import raw dataset
     df = pd.read_csv("data/mbti_1.csv")[0:N]
 
-###### Preprocess posts from users
+###### Preprocess posts from users and decided whether to keep or remove string mbti types i.e. "infp" in order for more accuracy for feature selection
     # create new csv file of dataset with added preprocessed text data
-    df["preprocessed_text"] = df["posts"].apply(lambda x: preprocessing(x))
+    df["preprocessed_text"] = df["posts"].apply(lambda x: preprocessing(x, remove_types = bool))
     df.to_csv("data/df_multi_preprocessed.csv")
 
 ###### Create train and test split and choose in function whether you want to balance (Oversampler with not majority strategy) and whether you want to encode the target variable for binary- (1 - Introverted | 0 - Extroverted) or multi-classification
@@ -72,7 +72,7 @@ we use the following paradigms for solving the multi-classification problem:
     X_test_Feature_Matrix = BERT_Features(X_test, False, max_len=30)
 
 
- ##### Feature Selection in regard to Multi-Classification:
+ #### Feature Selection in regard to Multi-Classification (without removal of MBTI strings):
     
       # 0.0:
         . selected features: 79
@@ -137,6 +137,7 @@ we use the following paradigms for solving the multi-classification problem:
       # 15.0:
         . selected features: 65
         . top features: an istp,istp,istps,the istp,istps are,istp and,mechanic,fuck,sport,bike
+ 
 
 ###### Call Classifiers. Every function is given vectorizer (i.e. Embeddings; TFIDF only for naiveBayes). Also choose training parameters (epoch, maxlen) and whether to do k_fold and binary- or multi-classification.
     # Classification
