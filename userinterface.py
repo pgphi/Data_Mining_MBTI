@@ -45,8 +45,7 @@ def word_context(word):
 
 
 def userinterface():
-    
-    """
+
     st.title("Classifying Personality Types 🎭")
     st.subheader("University of Mannheim - DM I - Prof. Paulheim")
     st.write("A Project from Stefan, Mariam, Priscilla, Ricarda, Fabian and Philipp")
@@ -63,21 +62,20 @@ def userinterface():
     st.write(
         "We want to contribute to those findings by using a model which classifies the text input of users and shows "
         "his or her personality type based on [MBTI](https://simple.wikipedia.org/wiki/Myers-Briggs_Type_Indicator)"
-        ", as well as the context of a specific word in order to find out the individual differences in word use in regard to personality types.")
+        ", as well as the context of a specific word in order to find out the individual differences in word use.")
     st.info(
         "We used the [(MBTI) Myers-Briggs Personality Type Dataset](https://www.kaggle.com/datasets/datasnaek/mbti-type) "
         "from Kaggle to train our model. For more information on our model see our [Github Repository](https://github.com/pgphi/Data_Mining_MBTI)")
     st.markdown("")
     st.markdown("***")
     st.markdown("")
-    """
     
     st.subheader("Analyzing The Word Context based on Personality Types 💬")
     st.write("University of Mannheim - DM I - Prof. Paulheim")
     st.caption("A Project from Stefan, Mariam, Priscilla, Ricarda, Fabian and Philipp")
 
 
-    word = st.text_input("Type in your favorite word:", placeholder="i.e. thinking", help="only lower case!")
+    word = st.text_input("Type in your favorite word:", placeholder="i.e. thinking", help="Please only lower case!")
 
     while word == False:
         time.sleep(999999)
@@ -98,4 +96,4 @@ try:
         pass
 
 except KeyError:
-        st.info("Word not in corpus or lower case. Try using another word or upper case (case sensitive!).")
+        st.info("Word not in corpus or upper case detected (case sensitive). Try using another word and upper case.")
