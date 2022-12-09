@@ -10,6 +10,7 @@
       December 2022
       
       https://github.com/pgphi/Data_Mining_MBTI/blob/main/High-Fidelity-Prototype.mov
+      (Example for binary Classification)
 
 ---
 
