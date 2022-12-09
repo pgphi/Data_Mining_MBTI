@@ -63,7 +63,7 @@ def userinterface():
     st.write(
         "We want to contribute to those findings by using a model which classifies the text input of users and shows "
         "his or her personality type based on [MBTI](https://simple.wikipedia.org/wiki/Myers-Briggs_Type_Indicator)"
-        ", as well as the context of a specific word in order to find out the individual differences in word use.")
+        ", as well as the context of a specific word in order to find out the individual differences in word use in regard to personality types.")
     st.info(
         "We used the [(MBTI) Myers-Briggs Personality Type Dataset](https://www.kaggle.com/datasets/datasnaek/mbti-type) "
         "from Kaggle to train our model. For more information on our model see our [Github Repository](https://github.com/pgphi/Data_Mining_MBTI)")
@@ -77,7 +77,7 @@ def userinterface():
     st.caption("A Project from Stefan, Mariam, Priscilla, Ricarda, Fabian and Philipp")
 
 
-    word = st.text_input("Type in your favorite word:", placeholder="i.e. thinking")
+    word = st.text_input("Type in your favorite word:", placeholder="i.e. thinking", helph="only lower case!))
 
     while word == False:
         time.sleep(999999)
@@ -98,4 +98,4 @@ try:
         pass
 
 except KeyError:
-        st.info("Word not in corpus. Try using another word.")
+        st.info("Word not in corpus or lower case. Try using another word or upper case (case sensitive!).")
