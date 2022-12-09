@@ -151,3 +151,10 @@ we use the following paradigms for solving the multi-classification problem:
     NN_classifier(X_train_vec, y_train, X_test_pad_seq, y_test, vectorizer, binary=True, maxlen=50, epoch=1)  # use different embeddings for vectorizer!
     BERT_classifier(X_train_Feature_Matrix, X_test_Feature_Matrix, y_train, y_test, binary=False, epoch=3, maxlen=30) # use BERT Features!
     
+
+
+
+### Paper Feature Generation
+    Use the Feature_Generation.ipynb to generate features sourced from different research papers about personality-types. 
+    After the generation, the already preprocessed dataset gets merged with the new feature columns. 
+
