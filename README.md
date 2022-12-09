@@ -15,7 +15,7 @@
 ### About this Project
 
 ![User Interface](https://github.com/pgphi/Data_Mining_MBTI/blob/main/img/ui.png)
-      unfortunately, the model size is too large in order to deploy on heroku. Hence limits of ressorces we didn't choose a cloud approach for third-           party-deployment i.e. AWS.
+      unfortunately, the size of the pickle file of the model is too large in order to deploy on heroku. Hence limits of resources we didn't choose a           cloud approach for third-party-deployment i.e. AWS.
 
 #### Motivation
 The purpose of this project is, to classify the MBTI 16 personality types based on a given text input.
