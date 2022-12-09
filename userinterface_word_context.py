@@ -7,7 +7,7 @@ from sklearn import manifold
 
 
 def word_context(word):
-    w2v_model = pickle.load(open('models/w2v_model.pkl', 'rb'))
+    w2v_model = pickle.load(open('models/w2v_word_context_v2', 'rb'))
 
     ## Visualize word and its context in 3D Vector Space
     fig = plt.figure()
