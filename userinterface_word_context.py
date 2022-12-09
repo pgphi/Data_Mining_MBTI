@@ -23,7 +23,7 @@ def userinterface():
     st.write("University of Mannheim - DMI - Prof. Paulheim")
     st.caption("By Stefan, Mariam, Fabian, Ricarda, Priscilla and Philipp")
     st.markdown("***")
-    word = st.text_input("Type in your favorite word:", placeholder="i.e. thinking")
+    word = st.text_input("Type in your favorite word (lower case - case sensitive!):", placeholder="i.e. thinking")
     st.success("Stay patient. It takes a few seconds for the model to make a prediction.")
 
     while word == False:
@@ -45,7 +45,7 @@ try:
         pass
 
 except KeyError:
-        st.info("Word not in corpus. Try using another word.")
+        st.info("Word not in corpus or upper case (case sensitive!). Try using another word.")
 """
 
 word_context("I dont know what to do")
