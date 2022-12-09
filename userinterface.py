@@ -77,7 +77,7 @@ def userinterface():
     st.caption("A Project from Stefan, Mariam, Priscilla, Ricarda, Fabian and Philipp")
 
 
-    word = st.text_input("Type in your favorite word:", placeholder="i.e. thinking", helph="only lower case!))
+    word = st.text_input("Type in your favorite word:", placeholder="i.e. thinking", help="only lower case!))
 
     while word == False:
         time.sleep(999999)
