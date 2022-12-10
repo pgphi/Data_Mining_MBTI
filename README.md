@@ -32,7 +32,7 @@ we use the following paradigms for solving the multi-classification problem:
 
 #### Models for Classification
 
-1) Naive Bayes Model (**Baseline**)
+1) Naive Bayes Model
 2) Decision Trees	Random Forest	
 3) Logistic Regression	
 4) LVM
